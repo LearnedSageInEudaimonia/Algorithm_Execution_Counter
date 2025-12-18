@@ -2,7 +2,13 @@ package com.aat.projects.algorithmExecutionCounter.service;
 
 import com.aat.projects.algorithmExecutionCounter.dto.AlgorithmsRequestDTO;
 import com.aat.projects.algorithmExecutionCounter.dto.AlgorithmsResponseDTO;
+import com.aat.projects.algorithmExecutionCounter.dto.searchAlgorithmDtos.SearchAlgorithmsRequestDTO;
+import com.aat.projects.algorithmExecutionCounter.dto.searchAlgorithmDtos.SearchAlgorithmsResponseDTO;
 import com.aat.projects.algorithmExecutionCounter.enums.Algorithms;
+import com.aat.projects.algorithmExecutionCounter.enums.SearchArray;
+import com.aat.projects.algorithmExecutionCounter.searching.BinarySearch;
+import com.aat.projects.algorithmExecutionCounter.searching.LinearSearch;
+import com.aat.projects.algorithmExecutionCounter.searching.SearchResult;
 import com.aat.projects.algorithmExecutionCounter.sortingAlgorithms.BubbleSort;
 import com.aat.projects.algorithmExecutionCounter.sortingAlgorithms.InsertionSort;
 import com.aat.projects.algorithmExecutionCounter.sortingAlgorithms.Result;
@@ -41,6 +47,33 @@ public class AlgorithmsService {
                 .timeComplexity(algorithmType.getTimeComplexity())
                 .stable(algorithmType.isStable())
                 .InPlace(algorithmType.isInPlace())
+                .build();
+    }
+
+    public SearchAlgorithmsResponseDTO executeSearchAlgorithm(SearchAlgorithmsRequestDTO request) {
+        SearchArray searchType = request.getSearchType();
+        int[] array = request.getArray();
+
+        SearchResult searchResult;
+
+        switch (searchType){
+            case LINEAR_SEARCH -> {
+                searchResult = LinearSearch.search(array, request.getTarget());
+            }
+            case BINARY_SEARCH -> {
+                searchResult = BinarySearch.search(array, request.getTarget());
+            }
+            default -> throw new IllegalArgumentException("Illegal Search Type");
+        }
+        return SearchAlgorithmsResponseDTO.builder()
+                .index(searchResult.getIndex())
+                .comparisons(searchResult.getComparisons())
+                .searchType(request.getSearchType())
+                .sortedRequired(searchType.isSorted())
+                .executionTimeNs(searchResult.getExecutionTimeNs())
+                .bigONotation(searchType.getBigONotation())
+                .arraySize(request.getArray().length)
+                .target(request.getTarget())
                 .build();
     }
 }
