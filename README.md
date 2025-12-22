@@ -6,7 +6,11 @@ API to execute classic sorting algorithms on an integer array and return both th
 
 - Supports Bubble Sort, Insertion Sort, and Selection Sort via a single endpoint.​
 
-- Returns rich metadata: original array, sorted array, comparison count, swap count, time complexity, stability, and in‑place information.​
+- Returns rich metadata: original array, sorted array, comparison count, swap count, time complexity, stability, and in‑place information.
+
+- Supports Linear Search, Binary Search via a single endpoint.
+
+- Returns rich metadata: target,index, array size,  search type, is Sorted, comparison count, BigONotation, Execution Time.​
 
 - Built with Spring Boot and uses a clean DTO-based contract for requests and responses.​
 
