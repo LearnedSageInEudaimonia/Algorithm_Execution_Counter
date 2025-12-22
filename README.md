@@ -6,7 +6,11 @@ API to execute classic sorting algorithms on an integer array and return both th
 
 - Supports Bubble Sort, Insertion Sort, and Selection Sort via a single endpoint.​
 
-- Returns rich metadata: original array, sorted array, comparison count, swap count, time complexity, stability, and in‑place information.​
+- Returns rich metadata: original array, sorted array, comparison count, swap count, time complexity, stability, and in‑place information.
+
+- Supports Linear Search, Binary Search via a single endpoint.
+
+- Returns rich metadata: target,index, array size,  search type, is Sorted, comparison count, BigONotation, Execution Time.​
 
 - Built with Spring Boot and uses a clean DTO-based contract for requests and responses.​
 
@@ -15,7 +19,11 @@ API to execute classic sorting algorithms on an integer array and return both th
 
 ## Sort Algorithms Endpoint
 - POST /algorithms/sort-algorithms​
-- Executes the specified sorting algorithm on the input array and returns statistics about the execution.​
+- Executes the specified sorting algorithm on the input array and returns statistics about the execution.
+
+## Search Algorithm Endpoint
+- POST /algorithms/search-algorithms
+- Executes the specified searching algorithm on the given array, finds the target elements and returns statics about the execution.​
 
 ## Request
 - Content-Type: application/json​
@@ -28,14 +36,25 @@ API to execute classic sorting algorithms on an integer array and return both th
   "array": [5, 3, 8, 4, 2]
 }
 ```
-
-## algorithms enum values:​
+- Body schema: SearchAlgorithmsRequestDTO
+```json
+{
+  "searchType": "BINARY_SEARCH",
+  "array": [1,2,3,4,5,6,7,8,9],
+  "target": 3
+}
+```
+## sorting algorithms enum values:​
 
 - BUBBLE_SORT
 
 - INSERTION_SORT
 
 - SELECTION_SORT
+
+## Searching algorithms enum values:
+- LINEAR_SEARCH
+- BINARY_SEARCH
 
 ## array:
 
@@ -62,6 +81,7 @@ API to execute classic sorting algorithms on an integer array and return both th
   "inPlace": true
 }
 ```
+
 ## Field descriptions:​
 
 - algorithms: Algorithm used (BUBBLE_SORT, INSERTION_SORT, SELECTION_SORT).
@@ -79,6 +99,38 @@ API to execute classic sorting algorithms on an integer array and return both th
 - stable: Whether the algorithm is stable for this implementation.
 
 - inPlace: Whether the algorithm sorts in place without extra significant memory.
+
+- ### Body schema: SearchAlgortihmsResponseDTO
+- Example:
+  ```json
+  {
+    "searchType": "BINARY_SEARCH",
+    "target": 3,
+    "comparisons": 4,
+    "index": 2,
+    "executionTimeNs": 6400,
+    "sortedRequired": true,
+    "arraySize": 9,
+    "bigONotation": "O(log n)"
+  }
+  ```
+ ## Field descriptions:
+
+- **searchType**: Search algorithm used to find the target value (e.g., `LINEAR_SEARCH`, `BINARY_SEARCH`).
+
+- **target**: The value that is being searched for in the input array.
+
+- **comparisons**: Total number of element comparisons performed during the search execution.
+
+- **index**: Index position where the target value was found. Returns `-1` if the target is not present.
+
+- **executionTimeNs**: Time taken to execute the search algorithm, measured in nanoseconds.
+
+- **sortedRequired**: Indicates whether the input array must be sorted before applying the selected search algorithm.
+
+- **arraySize**: Total number of elements present in the input array.
+
+- **bigONotation**: Time complexity of the search algorithm expressed in Big-O notation (e.g., `O(n)`, `O(log n)`).
 
 ## Running the Application
 - Clone the repository:
