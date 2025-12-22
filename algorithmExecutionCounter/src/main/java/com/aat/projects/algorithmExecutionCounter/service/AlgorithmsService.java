@@ -4,8 +4,12 @@ import com.aat.projects.algorithmExecutionCounter.dto.AlgorithmsRequestDTO;
 import com.aat.projects.algorithmExecutionCounter.dto.AlgorithmsResponseDTO;
 import com.aat.projects.algorithmExecutionCounter.dto.searchAlgorithmDtos.SearchAlgorithmsRequestDTO;
 import com.aat.projects.algorithmExecutionCounter.dto.searchAlgorithmDtos.SearchAlgorithmsResponseDTO;
+import com.aat.projects.algorithmExecutionCounter.entity.SearchAlgorithmHistory;
+import com.aat.projects.algorithmExecutionCounter.entity.SortAlgorithmHistory;
 import com.aat.projects.algorithmExecutionCounter.enums.Algorithms;
 import com.aat.projects.algorithmExecutionCounter.enums.SearchArray;
+import com.aat.projects.algorithmExecutionCounter.repository.SearchAlgorithmRepository;
+import com.aat.projects.algorithmExecutionCounter.repository.SortAlgorithmRepository;
 import com.aat.projects.algorithmExecutionCounter.searching.BinarySearch;
 import com.aat.projects.algorithmExecutionCounter.searching.LinearSearch;
 import com.aat.projects.algorithmExecutionCounter.searching.SearchResult;
@@ -16,10 +20,21 @@ import com.aat.projects.algorithmExecutionCounter.sortingAlgorithms.SelectionSor
 import org.springframework.stereotype.Service;
 
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 
 @Service
 public class AlgorithmsService {
+
+    private final SortAlgorithmRepository sortAlgorithmRepository;
+    private final SearchAlgorithmRepository searchAlgorithmRepository;
+
+    public AlgorithmsService(SortAlgorithmRepository sortAlgorithmRepository,
+                             SearchAlgorithmRepository searchAlgorithmRepository) {
+        this.sortAlgorithmRepository = sortAlgorithmRepository;
+        this.searchAlgorithmRepository = searchAlgorithmRepository;
+    }
+
     public AlgorithmsResponseDTO executeSortingAlgorithm(AlgorithmsRequestDTO request){
         Algorithms algorithmType = request.getAlgorithms();
         int[] originalArray = request.getArray();
@@ -38,6 +53,18 @@ public class AlgorithmsService {
             }
             default -> throw new IllegalArgumentException("UnSupported algorithm Type");
         }
+        SortAlgorithmHistory sortAlgorithmHistory = SortAlgorithmHistory.builder()
+                .algorithmsType(algorithmType)
+                .arraySize(originalArray.length)
+                .inplace(algorithmType.isInPlace())
+                .stable(algorithmType.isStable())
+                .timeComplexity(algorithmType.getTimeComplexity())
+                .swaps(result.getSwaps())
+                .comparisons(result.getComparisons())
+                .time(LocalDateTime.now())
+                .build();
+        sortAlgorithmRepository.save(sortAlgorithmHistory);
+
         return AlgorithmsResponseDTO.builder()
                 .algorithms(algorithmType)
                 .comparisons(result.getComparisons())
@@ -65,6 +92,19 @@ public class AlgorithmsService {
             }
             default -> throw new IllegalArgumentException("Illegal Search Type");
         }
+        SearchAlgorithmHistory searchAlgorithmHistory = SearchAlgorithmHistory.builder()
+                .arraySize(array.length)
+                .bigONotation(searchType.getBigONotation())
+                .comparisons(searchResult.getComparisons())
+                .index(searchResult.getIndex())
+                .target(request.getTarget())
+                .executionTimeNs(searchResult.getExecutionTimeNs())
+                .sortedRequired(searchType.isSorted())
+                .searchType(request.getSearchType())
+                .time(LocalDateTime.now())
+                .build();
+
+        searchAlgorithmRepository.save(searchAlgorithmHistory);
         return SearchAlgorithmsResponseDTO.builder()
                 .index(searchResult.getIndex())
                 .comparisons(searchResult.getComparisons())
